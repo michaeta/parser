@@ -84,10 +84,6 @@ def assertT(tokens):
     # of how far we have parsed
     popped = 0
     
-    # This line is blank?!?!? RETURN!
-    if tokens == []:
-        return
-    
     # T -> ( S )
     # checks to make sure that beginning and end () are there
     # Yes, S should be checked in the middle, but why parse all of S if the last ) is gone? 
@@ -96,8 +92,25 @@ def assertT(tokens):
     else: raise Exception("Syntax Error, Improper nested paren.")
     
     # assert that production S -> () | atom | ( S ) | () S | atom S | ( S ) S is enforced
-    assertS(tokens[popped:(len(tokens)-1)])
+    popped += assertS(tokens[popped:(len(tokens)-1)])
     
+    # + 1 is for end ) which was removed at begining
+    return popped + 1
+    
+    
+def assertF(tokens):
+    popped = 0
+    
+    # This line is blank?!?!? RETURN!
+    if tokens == []: return
+    
+    # F -> T 
+    popped += assertT(tokens)
+    
+    # F -> T F
+    if popped < len(tokens): assertF(tokens[popped:])
+    
+            
 # open that source code and make sure its syntax is correct!
 def parse(file_name):
     # 2D list, doesn't have to be, but it makes it easier to print
@@ -111,8 +124,8 @@ def parse(file_name):
     for line in lines:
         #convert line into list of tokens: TOKENIZE!!!!
         tokens = scanner.scan(line)
-        # asserts production T -> ( S ) is enforced
-        assertT(tokens) 
+        # asserts production F -> T | T F is enforced
+        assertF(tokens) 
         # append list of tokens to total parsed, this line is assured correct
         total_parsed.append(tokens)
     
