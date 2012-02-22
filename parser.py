@@ -2,7 +2,7 @@ import os, sys
 pro_dir = os.path.dirname(os.getcwd())
 sys.path[0] = pro_dir
 
-from milestone2 import scanner
+from milestone3 import scanner
 
 def assertS(tokens):
     popped = 0
