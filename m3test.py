@@ -6,7 +6,7 @@ import m3parser
 pass_test_list = [
             '(())',
             '(atom)',
-            '((()))',
+            '(atom)(atom)',
             '(()())',
             '(atom ())',
             '((())())',
