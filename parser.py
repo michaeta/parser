@@ -24,12 +24,12 @@ def assertS(tokens):
                 popped += 1
                 # try and match the final S in the production
                 try: popped += assertS(tokens[popped:])
-                # the 2nd S failed to match... 
+                # the 2nd S failed to match...
                 except: pass
-                # holy crap! We matched the whole ( S ) S 
+                # holy crap! We matched the whole ( S ) S
                 else: return popped
     
-    # well, we failed to match ( S ) S, so its time to see if we can match one of the 
+    # well, we failed to match ( S ) S, so its time to see if we can match one of the
     # other productions. First we have to reset any partial matches though.
     popped = 0
         
@@ -38,7 +38,7 @@ def assertS(tokens):
         popped += 1
         try: popped += assertS(tokens[popped:])
         except: pass
-        else: 
+        else:
             if isinstance(tokens[popped], scanner.EndExpr): return popped + 1
     
     popped = 0
@@ -50,7 +50,7 @@ def assertS(tokens):
             popped += 1
             try: popped += assertS(tokens[popped:])
             except: pass
-            else: return popped 
+            else: return popped
         
     popped = 0
     
@@ -72,7 +72,7 @@ def assertS(tokens):
     popped = 0
     
     # S -> atom
-    if not (isinstance(tokens[0], scanner.StartExpr) or 
+    if not (isinstance(tokens[0], scanner.StartExpr) or
             isinstance(tokens[0], scanner.EndExpr)): return popped + 1
     
     # Well... we checked for every production and nothing matched...
@@ -88,8 +88,8 @@ def assertT(tokens):
     
     # T -> ( S )
     # checks to make sure that beginning and end () are there
-    # Yes, S should be checked in the middle, but why parse all of S if the last ) is gone? 
-    if (isinstance(tokens[0], scanner.StartExpr) and 
+    # Yes, S should be checked in the middle, but why parse all of S if the last ) is gone?
+    if (isinstance(tokens[0], scanner.StartExpr) and
         isinstance(tokens[len(tokens)-1], scanner.EndExpr)): popped += 1
     else: raise Exception("Syntax Error, Improper nested paren.")
     
@@ -106,7 +106,7 @@ def assertF(tokens):
     # This line is blank?!?!? RETURN!
     if tokens == []: return
     
-    # F -> T 
+    # F -> T
     popped += assertT(tokens)
     
     # F -> T F
@@ -114,21 +114,23 @@ def assertF(tokens):
     
             
 # open that source code and make sure its syntax is correct!
-def parse():
-    # 2D list, doesn't have to be, but it makes it easier to print
+def parse(line):
+    tokens = scanner.scan(line)
+    # asserts production F -> T | T F is enforced
+    assertF(tokens)
+    return
+
+def parser_wrapper():
     total_parsed = []
-    # for each line, each line is a statement with () around it
+    
     for line in fileinput.input():
-        #convert line into list of tokens: TOKENIZE!!!!
-        tokens = scanner.scan(line)
-        # asserts production F -> T | T F is enforced
-        assertF(tokens) 
-        # append list of tokens to total parsed, this line is assured correct
+        parse(line)
         total_parsed.append(tokens)
+    
     return total_parsed
 
 def main():
-    output = parse()
+    output = parser_wrapper()
     
     for statement in output:
         for token in statement:
@@ -136,6 +138,8 @@ def main():
             # uncomment the if statement below to skip printing blank lines from source file.
             #if len(statement) > 0:
         print
+    
+    print "Successfully parsed with no errors."
 
 if __name__ == '__main__':
     main()
