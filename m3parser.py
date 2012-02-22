@@ -1,17 +1,13 @@
 import os, sys
-pro_dir = os.path.dirname(os.getcwd())
-sys.path[0] = pro_dir
-
-from milestone3 import scanner
+import m3scanner
 import fileinput
-import sys
 
 def assertS(tokens):
     popped = 0
     
     # S -> ( S ) S
     # match first (
-    if isinstance(tokens[0], scanner.StartExpr):
+    if isinstance(tokens[0], m3scanner.StartExpr):
         popped += 1
         # try and match the S next
         try: popped += assertS(tokens[popped:])
@@ -20,7 +16,7 @@ def assertS(tokens):
         # we got a match for S !
         else:
             # check for the ) next
-            if isinstance(tokens[popped], scanner.EndExpr):
+            if isinstance(tokens[popped], m3scanner.EndExpr):
                 popped += 1
                 # try and match the final S in the production
                 try: popped += assertS(tokens[popped:])
@@ -34,19 +30,19 @@ def assertS(tokens):
     popped = 0
         
     # S -> ( S )
-    if isinstance(tokens[0], scanner.StartExpr):
+    if isinstance(tokens[0], m3scanner.StartExpr):
         popped += 1
         try: popped += assertS(tokens[popped:])
         except: pass
         else:
-            if isinstance(tokens[popped], scanner.EndExpr): return popped + 1
+            if isinstance(tokens[popped], m3scanner.EndExpr): return popped + 1
     
     popped = 0
         
     # S -> () S
-    if isinstance(tokens[0], scanner.StartExpr):
+    if isinstance(tokens[0], m3scanner.StartExpr):
         popped += 1
-        if isinstance(tokens[1], scanner.EndExpr):
+        if isinstance(tokens[1], m3scanner.EndExpr):
             popped += 1
             try: popped += assertS(tokens[popped:])
             except: pass
@@ -55,15 +51,15 @@ def assertS(tokens):
     popped = 0
     
     # S -> ()
-    if isinstance(tokens[0], scanner.StartExpr):
+    if isinstance(tokens[0], m3scanner.StartExpr):
         popped += 1
-        if isinstance(tokens[1], scanner.EndExpr): return popped + 1
+        if isinstance(tokens[1], m3scanner.EndExpr): return popped + 1
     
     popped = 0
     
     # S -> atom S
     # an atom is defined as any token except an ( or )
-    if not (isinstance(tokens[0], scanner.StartExpr) or isinstance(tokens[0], scanner.EndExpr)):
+    if not (isinstance(tokens[0], m3scanner.StartExpr) or isinstance(tokens[0], m3scanner.EndExpr)):
         popped += 1
         try: popped += assertS(tokens[popped:])
         except: pass
@@ -72,8 +68,8 @@ def assertS(tokens):
     popped = 0
     
     # S -> atom
-    if not (isinstance(tokens[0], scanner.StartExpr) or
-            isinstance(tokens[0], scanner.EndExpr)): return popped + 1
+    if not (isinstance(tokens[0], m3scanner.StartExpr) or
+            isinstance(tokens[0], m3scanner.EndExpr)): return popped + 1
     
     # Well... we checked for every production and nothing matched...
     # Time to raise an Exception
@@ -89,8 +85,8 @@ def assertT(tokens):
     # T -> ( S )
     # checks to make sure that beginning and end () are there
     # Yes, S should be checked in the middle, but why parse all of S if the last ) is gone?
-    if (isinstance(tokens[0], scanner.StartExpr) and
-        isinstance(tokens[len(tokens)-1], scanner.EndExpr)): popped += 1
+    if (isinstance(tokens[0], m3scanner.StartExpr) and
+        isinstance(tokens[len(tokens)-1], m3scanner.EndExpr)): popped += 1
     else: raise Exception("Syntax Error, Improper nested paren.")
     
     # assert that production S -> () | atom | ( S ) | () S | atom S | ( S ) S is enforced
@@ -115,7 +111,7 @@ def assertF(tokens):
             
 # open that source code and make sure its syntax is correct!
 def parse(line):
-    tokens = scanner.scan(line)
+    tokens = m3scanner.scan(line)
     # asserts production F -> T | T F is enforced
     assertF(tokens)
     return tokens
