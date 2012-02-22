@@ -3,6 +3,8 @@ pro_dir = os.path.dirname(os.getcwd())
 sys.path[0] = pro_dir
 
 from milestone3 import scanner
+import fileinput
+import sys
 
 def assertS(tokens):
     popped = 0
@@ -112,45 +114,28 @@ def assertF(tokens):
     
             
 # open that source code and make sure its syntax is correct!
-def parse(file_name):
+def parse():
     # 2D list, doesn't have to be, but it makes it easier to print
     total_parsed = []
-    
-    # open file, each line of source code is a string in list lines
-    with open(file_name) as fp:
-        lines = fp.readlines()
-    
     # for each line, each line is a statement with () around it
-    for line in lines:
+    for line in fileinput.input():
         #convert line into list of tokens: TOKENIZE!!!!
         tokens = scanner.scan(line)
         # asserts production F -> T | T F is enforced
         assertF(tokens) 
         # append list of tokens to total parsed, this line is assured correct
         total_parsed.append(tokens)
-    
     return total_parsed
 
-
-# main is used for test cases
 def main():
-    output = parse("test_case.txt")
+    output = parse()
     
     for statement in output:
         for token in statement:
             print token,
-        # uncomment the if statement below to skip printing blank lines from source file.
-        #if len(statement) > 0:
+            # uncomment the if statement below to skip printing blank lines from source file.
+            #if len(statement) > 0:
         print
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
-    
-
-        
-
-    
-            
-                
