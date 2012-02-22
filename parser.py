@@ -118,13 +118,13 @@ def parse(line):
     tokens = scanner.scan(line)
     # asserts production F -> T | T F is enforced
     assertF(tokens)
-    return
+    return tokens
 
 def parser_wrapper():
     total_parsed = []
     
     for line in fileinput.input():
-        parse(line)
+        tokens = parse(line)
         total_parsed.append(tokens)
     
     return total_parsed
