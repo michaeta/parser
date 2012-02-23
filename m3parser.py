@@ -2,6 +2,17 @@ import os, sys
 import m3scanner
 import fileinput
 
+class TreeNode(object):
+    
+    # Usage: root = TreeNode(None, data)
+    def __init__(self, parent, data):
+        self.data = data
+        self.parent = parent
+        self.children = []
+
+    def add_child(self, child):
+        self.children.append(child)
+
 def assertS(tokens):
     popped = 0
     
